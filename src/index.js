@@ -1,3 +1,7 @@
-console.log("Backend learning");
-console.log("Backend learning");
+import { app } from "./app.js";
 
+const port = 8000;
+app.listen (port , () => {
+    console.log(`App is running on the ${port}`);
+    
+})
