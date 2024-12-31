@@ -1,5 +1,6 @@
 import { app } from "./app.js";
 import dotenv from "dotenv";
+import connectDb from "./db/index.js";
 
 dotenv.config({
   path: "./.env"
@@ -7,6 +8,13 @@ dotenv.config({
 
 const port = process.env.PORT || 2000; // Set a default port if not found in .env
 
-app.listen(port, () => {
-  console.log(`App is running on port ${port}`);
-});
+connectDb()
+.then(() => { 
+  app.listen(port , () => {
+    console.log(`Server is listening at ${port}`)
+  })
+})
+.catch((err) => {
+  console.log("Connection failed");
+  
+})
