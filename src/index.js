@@ -10,12 +10,3 @@ dotenv.config({
 const port = process.env.PORT || 2000; // Set a default port if not found in .env
 
 connectDb()
-.then(() => { 
-  app.listen(port , () => {
-    console.log(`Server is listening at ${port}`)
-  })
-})
-.catch((err) => {
-  console.log("Connection failed");
-  
-})
