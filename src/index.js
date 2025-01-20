@@ -1,6 +1,7 @@
 import { app } from "./app.js";
 import dotenv from "dotenv";
 import connectDb from "./db/index.js";
+import { ApiResponse } from "./utils/apiResponse.js";
 // import ApiResponse from "./utils/apiResponse.js";
 
 dotenv.config({
