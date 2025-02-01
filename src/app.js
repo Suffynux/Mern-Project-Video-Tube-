@@ -2,7 +2,6 @@ import express from "express";
 const app = express();
 import cors from "cors";
 import cookieParser from "cookie-parser";   
-import e from "express";
 
 // Middleware
 app.use(cors(
@@ -21,6 +20,7 @@ app.use(cookieParser());
 import userRouter from "./routes/user.routes.js";
 
 // route declaration
-app.use("api/v1/users" , userRouter)
+app.use("/api/v1/users" , userRouter)
+
 
 export {app}

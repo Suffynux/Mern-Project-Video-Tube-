@@ -12,10 +12,6 @@ dotenv.config({
 const port = process.env.PORT || 2000; // Set a default port if not found in .env
 console.log(port)
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
 connectDb()
 .then(()=>{
   app.listen(port, () => {
