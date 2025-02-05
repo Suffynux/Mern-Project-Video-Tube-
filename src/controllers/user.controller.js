@@ -1,12 +1,15 @@
 import {asyncHandler} from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
+import {User} from "../models/user.model.js";
+// import {upload} from "../middleware/multer.middleware.js"
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
 const registerUser = asyncHandler(async(req , res) =>{
     // get users details from Frontend/Postman
     // Validation - Not empty
     // Check if user is already is exists : username and email 
     // Check for images , check for avatar
-    // If images and avatar exists then send to cloudinary
+    //   If images and avatar exists then send to cloudinary
     // Create user object - create entry in db
     // check user creation
     // return response
@@ -36,7 +39,47 @@ const registerUser = asyncHandler(async(req , res) =>{
     if(password === ""){
         throw new ApiError(400 , "password is required")
     }
-}
-);
+
+    // Validation for email and username
+    const existedUser = User.findOne({
+        $or : [{username}, {email}]
+    });
+
+    if(existedUser){
+        throw new ApiError(409 , "User and Email already Existed")
+    }
+
+    // Check for images 
+    const avatorLocalPath = req.files?.avator[0]?.path;
+    const coverImagePath = req.files?.coverImage[0]?.path;
+
+    if(!avatorLocalPath) {
+        throw new ApiError(400 , "Avator is required");
+    }
+
+    const avator = await uploadOnCloudinary(avatorLocalPath)
+    const coverImage = await uploadOnCloudinary(coverImage)
+
+    if(!avator) {
+        throw new ApiError(400 , "Avator is required");
+    }
+
+    const user = await User.create({
+        fullName,
+        avator : avator.url,
+        coverImage : coverImage?.url || "",
+        email,
+        password,
+        username : username.toLowerCase()
+    })
+
+    await User.findById(user._id).select(
+        "-password -refreshToken"
+    );
+
+    if(!user) {
+        throw new ApiError(500 , "Something went wrong while registering a User");
+    }
+});
 
 export {registerUser};
