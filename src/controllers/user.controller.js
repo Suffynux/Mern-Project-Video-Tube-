@@ -3,6 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import {User} from "../models/user.model.js";
 // import {upload} from "../middleware/multer.middleware.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import {ApiResponse} from "../utils/apiResponse.js"
 
 const registerUser = asyncHandler(async(req , res) =>{
     // get users details from Frontend/Postman
@@ -81,6 +82,10 @@ const registerUser = asyncHandler(async(req , res) =>{
     if(!createdUser) {
         throw new ApiError(500 , "Something went wrong while registering a User");
     }
+
+    return res.status(201).json(
+        new ApiResponse(200 , "User registered Successfully")
+    )
 });
 
 export {registerUser};
