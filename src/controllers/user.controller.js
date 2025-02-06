@@ -58,7 +58,7 @@ const registerUser = asyncHandler(async(req , res) =>{
     }
 
     const avator = await uploadOnCloudinary(avatorLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImage)
+    const coverImage = await uploadOnCloudinary(coverImagePath)
 
     if(!avator) {
         throw new ApiError(400 , "Avator is required");
@@ -73,11 +73,12 @@ const registerUser = asyncHandler(async(req , res) =>{
         username : username.toLowerCase()
     })
 
-    await User.findById(user._id).select(
+    // checking the user is created or not 
+    const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     );
 
-    if(!user) {
+    if(!createdUser) {
         throw new ApiError(500 , "Something went wrong while registering a User");
     }
 });
