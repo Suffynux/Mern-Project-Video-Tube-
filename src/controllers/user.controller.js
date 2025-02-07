@@ -42,7 +42,7 @@ const registerUser = asyncHandler(async(req , res) =>{
     }
 
     // Validation for email and username
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or : [{username}, {email}]
     });
 
@@ -51,23 +51,27 @@ const registerUser = asyncHandler(async(req , res) =>{
     }
 
     // Check for images 
-    const avatorLocalPath = req.files?.avator[0]?.path;
+    const avatorLocalPath = req.files?.avatar[0]?.path;
     const coverImagePath = req.files?.coverImage[0]?.path;
 
     if(!avatorLocalPath) {
         throw new ApiError(400 , "Avator is required");
     }
 
-    const avator = await uploadOnCloudinary(avatorLocalPath)
+    const avatar = await uploadOnCloudinary(avatorLocalPath)
     const coverImage = await uploadOnCloudinary(coverImagePath)
+    // console.log("Files received in request:", req.files);
+console.log("Avatar file path:", req.files?.avatar?.[0]?.path);
+console.log("Cover image file path:", req.files?.coverImage?.[0]?.path);
 
-    if(!avator) {
-        throw new ApiError(400 , "Avator is required");
+
+    if(!avatar) {
+        throw new ApiError(400 , " is required");
     }
 
     const user = await User.create({
-        fullName,
-        avator : avator.url,
+        fullName, 
+        avatar : avatar?.url,
         coverImage : coverImage?.url || "",
         email,
         password,
@@ -88,4 +92,4 @@ const registerUser = asyncHandler(async(req , res) =>{
     )
 });
 
-export {registerUser};
+export {registerUser}; 
