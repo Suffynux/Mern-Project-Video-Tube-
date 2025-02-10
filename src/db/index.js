@@ -5,11 +5,10 @@
   // connect db
   const connectDb = async () => {
     try {
-      // const connectionInstance = await mongoose.connect(`${process.env.MONGO_URI} / ${DB_NAME}`)
-      const connectionInstance = await mongoose.connect(`${process.env.MONGO_URI}/ ${DB_NAME}`);
-      console.log("Mongo DB connected" + `${connectionInstance.connection.host}`);
+      const connectionInstance = await mongoose.connect(`${process.env.MONGO_URI}`);
+      console.log("Mongo DB connected " + connectionInstance.connection.host);
     } catch (error) {
-      console.log("Mongo DB Connection Error, coming from Db folder :" `${error}`);
+      console.log("Mongo DB Connection Error, coming from Db folder:", error);
       process.exit(1);
     }
   };
