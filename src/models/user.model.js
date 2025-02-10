@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import bcyrpt from "bcrypt";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema(
@@ -53,13 +53,13 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
   let passwordSalt = 10;
   if (!this.isModified("password")) return next();
-  this.password = bcyrpt.hash(this.password, passwordSalt);
+  this.password = await bcrypt.hash(this.password, passwordSalt);
   next();
 });
 
 // Custom Moongoose Method for Password check
 userSchema.methods.isPasswordCorrect = async function (password) {
-  let checkedPassword = await bcyrpt.compare(password, this.password);
+  let checkedPassword = await bcrypt.compare(password, this.password);
   return checkedPassword;
 };
 

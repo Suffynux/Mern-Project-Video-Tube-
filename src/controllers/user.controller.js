@@ -42,27 +42,30 @@ const registerUser = asyncHandler(async(req , res) =>{
     }
 
     // Validation for email and username
-    const existedUser = await User.findOne({
-        $or : [{username}, {email}]
-    });
+    const existedUser = await User.findOne(
+        {$or : [{username}, {email}]}
+    )
 
-    if(existedUser){
-        throw new ApiError(409 , "User and Email already Existed")
+    if(existedUser) {
+        throw new ApiError(400 , "User already exists");
     }
-
     // Check for images 
     const avatorLocalPath = req.files?.avatar[0]?.path;
-    const coverImagePath = req.files?.coverImage[0]?.path;
+    let coverImagePath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length >0){
+        coverImagePath = req.files.coverImage[0].path;
+        console.log("worked")
+    }
 
+    console.log(req.files);
     if(!avatorLocalPath) {
         throw new ApiError(400 , "Avator is required");
     }
 
     const avatar = await uploadOnCloudinary(avatorLocalPath)
     const coverImage = await uploadOnCloudinary(coverImagePath)
-    // console.log("Files received in request:", req.files);
-console.log("Avatar file path:", req.files?.avatar?.[0]?.path);
-console.log("Cover image file path:", req.files?.coverImage?.[0]?.path);
+
+    
 
 
     if(!avatar) {
@@ -76,7 +79,7 @@ console.log("Cover image file path:", req.files?.coverImage?.[0]?.path);
         email,
         password,
         username : username.toLowerCase()
-    })
+    });
 
     // checking the user is created or not 
     const createdUser = await User.findById(user._id).select(
