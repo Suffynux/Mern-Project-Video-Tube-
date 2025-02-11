@@ -49,7 +49,7 @@ const registerUser = asyncHandler(async(req , res) =>{
     if(existedUser) {
         throw new ApiError(400 , "User already exists");
     }
-    // Check for images 
+    // Getting the image local path from req.files
     const avatorLocalPath = req.files?.avatar[0]?.path;
     let coverImagePath;
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length >0){
@@ -57,22 +57,20 @@ const registerUser = asyncHandler(async(req , res) =>{
         console.log("worked")
     }
 
-    console.log(req.files);
     if(!avatorLocalPath) {
         throw new ApiError(400 , "Avator is required");
     }
 
+    // Uploading the image to cloudinary
     const avatar = await uploadOnCloudinary(avatorLocalPath)
     const coverImage = await uploadOnCloudinary(coverImagePath)
 
-    
-
-
+    //If avator is not uploaded then throw an error
     if(!avatar) {
-        throw new ApiError(400 , " is required");
+        throw new ApiError(400 , "Avatar is required");
     }
 
-    
+    //Creating the user in the database
     const user = await User.create({
         fullName, 
         avatar : avatar?.url,
