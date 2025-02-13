@@ -5,6 +5,23 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 
+
+
+const generateAccessAndRefreshToken = async(userId) => {
+  try {
+    const user = User.findById(userId);
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+    user.refreshToken = refreshToken;
+    await user.save({validateBeforeSave : false})
+
+    // returning the refresh and access token
+    return { accessToken , refreshToken };
+  } catch (error) {
+    throw new ApiError(500 , "Something went wrong while generating refresh and access token")
+  }
+}
+
 const registerUser = asyncHandler(async (req, res) => {
   // get users details from Frontend/Postman
   // Validation - Not empty
@@ -119,6 +136,33 @@ const registerUser = asyncHandler(async (req, res) => {
           throw new ApiError(400, "User not found");
         }
 
+        const isPasswordValid = await isPasswordCorrect(password);
+
+        if(!isPasswordValid){
+          new ApiError(404 , "Invalid Credetionals");
+        }
+        // getting the access and refresh token from the method
+        const {accessToken , refreshToken} = await generateAccessAndRefreshToken(user._id);
+        const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+        // cookies option
+        const cookiesOption = {
+          httpOnly : true,
+          secure : true
+        }
+
+        return res.
+        status(200).cookie("accessToken" , accessToken ,cookiesOption)
+        .cookie("refreshToken" , refreshToken , cookiesOption)
+        .json(
+          new ApiResponse(
+            200,
+            {
+              user : loggedInUser , accessToken , refreshToken
+            },
+            "User logged in Successfully"
+          )
+        )
     });
 
 export { registerUser , loginUser };
