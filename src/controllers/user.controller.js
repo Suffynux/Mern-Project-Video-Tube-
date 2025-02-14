@@ -12,7 +12,7 @@ const generateAccessAndRefreshToken = async(userId) => {
     const user = User.findById(userId);
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
-    user.refreshToken = refreshToken;
+    user.refreshToken = refreshToken; 
     await user.save({validateBeforeSave : false})
 
     // returning the refresh and access token
@@ -124,7 +124,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
         const {email, username , password} = req.body;
 
-        if (!email || !email){
+        if (!email || !username){
           throw new ApiError(400, "Email or username is required");
         }
 
@@ -136,7 +136,7 @@ const registerUser = asyncHandler(async (req, res) => {
           throw new ApiError(400, "User not found");
         }
 
-        const isPasswordValid = await isPasswordCorrect(password);
+        const isPasswordValid = await user.isPasswordCorrect(password);
 
         if(!isPasswordValid){
           new ApiError(404 , "Invalid Credetionals");
@@ -152,7 +152,8 @@ const registerUser = asyncHandler(async (req, res) => {
         }
 
         return res.
-        status(200).cookie("accessToken" , accessToken ,cookiesOption)
+        status(200)
+        .cookie("accessToken" , accessToken ,cookiesOption)
         .cookie("refreshToken" , refreshToken , cookiesOption)
         .json(
           new ApiResponse(
