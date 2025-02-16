@@ -9,16 +9,21 @@ import { ApiResponse } from "../utils/apiResponse.js";
 
 const generateAccessAndRefreshToken = async(userId) => {
   try {
-    const user = User.findById(userId);
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
-    user.refreshToken = refreshToken; 
-    await user.save({validateBeforeSave : false})
+    const user = await User.findById(userId).exec();
+    
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
 
-    // returning the refresh and access token
-    return { accessToken , refreshToken };
+    const accessToken = await user.generateAccessToken();
+    const refreshToken = await user.generateRefreshToken();
+    
+    user.refreshToken = refreshToken; 
+    await user.save({validateBeforeSave: false});
+
+    return { accessToken, refreshToken };
   } catch (error) {
-    throw new ApiError(500 , "Something went wrong while generating refresh and access token")
+    throw new ApiError(500, "Something went wrong while generating refresh and access token");
   }
 }
 
@@ -63,6 +68,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (existedUser) {
     throw new ApiError(400, "User already exists");
   }
+
   // Getting the image local path from req.files
   const avatorLocalPath = req.files?.avatar[0]?.path;
   let coverImagePath;
@@ -121,15 +127,19 @@ const registerUser = asyncHandler(async (req, res) => {
     // response
     
     const loginUser = asyncHandler(async(req, res)=>{
-
-        const {email, username , password} = req.body;
-
-        if (!email || !username){
-          throw new ApiError(400, "Email or username is required");
+        const {email, username, password} = req.body;
+        
+        if (!password) {
+            throw new ApiError(400, "Password is required");
         }
 
+        if ((!email && !username)) {
+            throw new ApiError(400, "Email or username is required");
+        }
+
+        // If we get here, we have either email or username or both
         const user = await User.findOne({
-          $or:  [{email}, {username}]
+            $or: [{email}, {username}]
         })
 
         if(!user){
@@ -184,7 +194,8 @@ const registerUser = asyncHandler(async (req, res) => {
         secure : true
       }
 
-      res.status(200).clearCookies("accessToken" , cookiesOption ).clearCookies("refreshToken" , cookiesOption ).json(
+      res.status(200).clearCookie("accessToken" , cookiesOption )
+      .clearCookie("refreshToken" , cookiesOption ).json(
         new ApiResponse(200 , {} , "User logged out Successfully")
       )
 
