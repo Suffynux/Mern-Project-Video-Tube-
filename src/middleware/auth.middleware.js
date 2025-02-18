@@ -21,6 +21,7 @@ export const verifyJwt = asyncHandler(async (req, res, next) => {
     }
   
     req.user = user;
+    console.log("req.user", req.user);
     next();
   } catch (error) {
     throw new ApiError(400 , "Error while verfying token");

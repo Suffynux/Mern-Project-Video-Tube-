@@ -201,4 +201,18 @@ const registerUser = asyncHandler(async (req, res) => {
 
     });
 
+    // Api endpoint for refreshing the accesss token 
+    //getting the refrsh token from cookies
+    // chech if refresh token is valid or not
+    // if valid then generate new refresh token
+    const refreshAccessToken = asyncHandler(async(req , res)=> {
+      const refreshToken = req.cookie?.refreshToken;
+      if(!refreshToken ) {
+        const authToken = req.headers.authorization;
+        if(authToken.startWith("Bearer ")) {
+          refreshToken = authToken.split(" ")[1]; //split method return a array with the limit 1 
+        }
+      }
+    })
+
 export { registerUser , loginUser , logoutUser };
