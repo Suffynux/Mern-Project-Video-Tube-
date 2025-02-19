@@ -262,7 +262,7 @@ const resetPassword = asyncHandler(async(req , res) => {
   if (!(newPassword === confirmPassword)) {
     return new ApiError(401 , "Incorrect password, please try again")
   }
-  const userId = req.user?.id
+  const userId = req.user._id
   const user  = await User.findById(userId);
   const correctPassword = await user.isPasswordCorrect(oldPassword);
 
@@ -279,4 +279,48 @@ const resetPassword = asyncHandler(async(req , res) => {
 const getCurrentUser = asyncHandler(async(req ,res)=>{
   return res.status(200).json(new ApiResponse(200, req.user , "User fetched Successfully" ))
 });
-export { registerUser, loginUser, logoutUser , refreshAccessToken  , resetPassword , getCurrentUser};
+
+const updateUserDetails = asyncHandler(async(req ,res)=>{
+  const {fullName , username ,email } = req.body;
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  const userData = await User.findByIdAndUpdate(
+    user,
+    {
+      $set : {
+        fullName : fullName,
+        username : username,
+        email : email
+      }
+    },
+    {new : true}
+  ).select("-password")
+
+  res.status(200).json(new ApiResponse(200 , userData  ,"User details updated successfully" ))
+})
+
+const updateAvator = asyncHandler(async(req , res)=>{
+   const avatarLocalPath =  req.file.path;
+
+   if(!avatarLocalPath) {
+    throw new ApiError(400 , "Avator is missing in path")
+   }
+   const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+   if(!avatar.url) {
+    throw new ApiError(400 , "error while uploading image to cloudinary");
+   }
+
+   const userId = req.user._id;
+   const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set : {
+        avatar : avatar.url
+      }
+    },
+    {new : true}
+   )
+
+})
+export { registerUser, loginUser, logoutUser , refreshAccessToken  , resetPassword , getCurrentUser , updateUserDetails ,updateAvator };
