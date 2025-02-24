@@ -1,6 +1,5 @@
   // There always be the chance of error in database
   import mongoose from "mongoose";
-  import { DB_NAME } from "../constant.js"; // doubles dot refers to the parent directory
 
   // connect db
   const connectDb = async () => {

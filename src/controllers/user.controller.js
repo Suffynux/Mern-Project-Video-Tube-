@@ -345,6 +345,66 @@ const updateAvator = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200 , user , "Avator updated successfully"));
 });
 
+const getUserChannelProfile = asyncHandler(async(req ,res)=>{
+  const {username} = req.param
+  if(!username?.trim()){
+    throw new ApiError(400, "Username is missing in path");
+  }
+
+  const channel = await User.aggregate([
+    {
+      $match:{
+        username : username
+      }
+    },
+    { 
+      $lookup :{
+        from : "subscriptions",
+        localField : "_id",
+        foreignField : "channel",
+        as : "subscribers"
+      }
+    },
+    {
+      $lookup:{
+        from:"subscriptions",
+        localField : "_id",
+        foreignField: "subscriber",
+        as : "subscribedTo"
+      }
+    },
+    {
+      $addFields :{
+        subscribersCount : {
+          $size : "$subscribers"
+        },
+        subscribedToCount : {
+          $size : "$subscribedTo"
+        },
+        isSubscribed :{
+          $cond : {
+            if:{$in : [req.user.id, "$subscribers.subscriber"]},
+            then : true,
+            else : false
+          }
+        }
+
+      }
+    },
+    {
+      $project:{
+        fullName : 1,
+        username : 1,
+        subscribersCount : 1,
+        isSubscribed : 1,
+        subscribedToCount : 1,
+        coverImage : 1,
+        email : 1
+      }
+    }
+  ])
+});
+
 export {
   registerUser,
   loginUser,
@@ -354,4 +414,5 @@ export {
   getCurrentUser,
   updateUserDetails,
   updateAvator,
+  getUserChannelProfile
 };
