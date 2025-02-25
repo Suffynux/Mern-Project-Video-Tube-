@@ -5,23 +5,23 @@ const videoSchema = new  mongoose.Schema(
     {
         videoFile : {
             type : String, //Cloudnary string 
-            require : true
+            required : true
         },
         thumbnail : {
             type : String,
-            require : true, //Cloudnary string 
+            required : true, //Cloudnary string 
         },
         title : {
             type : String,
-            require : true,
+            required : true,
         },
         description : {
             type : String,
-            require : true,
+            required : true,
         },
         duration : {
             type : Number,
-            require : true
+            required : false
         },
         views : {
             type : Number,
@@ -33,7 +33,8 @@ const videoSchema = new  mongoose.Schema(
         },
         owner : {
             type : Schema.Types.ObjectId,
-            ref : "User"
+            ref : "User",
+            required : true
         }
     } , 
     {
