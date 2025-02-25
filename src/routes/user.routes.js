@@ -42,6 +42,6 @@ router.route("/current-user").get(verifyJwt, getCurrentUser);
 router.route("/update-userprofile").patch(verifyJwt, updateUserDetails);
 router.route("/avatar").post(verifyJwt, upload.single("avatar"), updateAvator);
 router.route("/c/:/username/").get(verifyJwt, getUserChannelProfile);
-router.route("watch-history").get(verifyJwt, getWatchHistory);
+router.route("/watch-history").get(verifyJwt, getWatchHistory);
 
 export default router;
