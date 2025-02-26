@@ -74,9 +74,32 @@ const getVideoById = asyncHandler(async (req, res) => {
 });
 
 const updateVideo = asyncHandler(async (req, res) => {
+    console.log("updateing Video and thumbnail")
     const { videoId } = req.params
-    
+    if(!videoId) {
+        throw new ApiError(400, "Video not Found")
+    }
+    const videoLocalPath = req.files?.video?.[0]?.path;
+    if(!videoLocalPath){
+        throw new ApiError(400, "Error while getting video")
+    }
 
+    const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path;
+    if(!thumbnailLocalPath){
+        throw new ApiError(400, "Error while getting thumbnail")
+    }
+
+    const video = await uploadOnCloudinary(videoLocalPath)
+    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+    const updatedVideo = await Video.findByIdAndUpdate(videoId , {
+        $set : {
+            video :video?.url,
+            thumbnail : thumbnail?.url || "" 
+        }
+    }, {new : true}
+)
+
+    return res.status(200).json(new ApiResponse(200 , updatedVideo, "Video and thumbnail updated successfully"))
 })
 
 const UpdateVideoDetails = asyncHandler(async(req , res)=>{
@@ -102,5 +125,18 @@ const UpdateVideoDetails = asyncHandler(async(req , res)=>{
 
     return res.status(200).json(new ApiResponse(200, updatedVideoData , "Title and descrition updated successfully"))
 })
+const deleteVideo = asyncHandler(async(req , res)=>{
+    //TODO: update video details like title, 
+    const {videoId} = req.params;
+    if(!videoId){
+        throw new ApiError(400, "Video not found")
+    }
+    const video = await Video.findById(videoId) 
+    const deletedVideo = await Video.findByIdAndDelete(video)
+    if(!deletedVideo){
+        throw new ApiError(400 , "Erro while deleting video")
+    }
+    return res.status(200).json(new ApiResponse(200, deletedVideo , "Video Deleted Successfully"))
+})
 
-export { publishAVideo , getVideoById , updateVideo , UpdateVideoDetails };
+export { publishAVideo , getVideoById , updateVideo , UpdateVideoDetails , deleteVideo  };
