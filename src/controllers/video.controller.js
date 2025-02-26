@@ -73,4 +73,34 @@ const getVideoById = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, video, "Video fetched successfully"))
 });
 
-export { publishAVideo , getVideoById };
+const updateVideo = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+    
+
+})
+
+const UpdateVideoDetails = asyncHandler(async(req , res)=>{
+    //TODO: update video details like title, 
+    console.log("Update is working ");
+    
+    const {title , description} = req.body;
+    if(!title && !description){
+        throw new ApiError(400 ,"Title and descritption required")
+    }
+    const {videoId} = req.params
+    const video = await Video.findById(videoId) 
+    const updatedVideoData = await Video.findByIdAndUpdate(
+        video,
+        {
+            $set : {
+                title : title,
+                description : description
+            }
+        },
+        {new : true}
+    )
+
+    return res.status(200).json(new ApiResponse(200, updatedVideoData , "Title and descrition updated successfully"))
+})
+
+export { publishAVideo , getVideoById , updateVideo , UpdateVideoDetails };
