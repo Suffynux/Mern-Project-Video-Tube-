@@ -3,6 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { Video } from "../models/video.model.js";
+import mongoose from "mongoose";
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description } = req.body;
@@ -61,4 +62,15 @@ const publishAVideo = asyncHandler(async (req, res) => {
     );
 });
 
-export { publishAVideo };
+const getVideoById = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+    //TODO: get video by id
+    console.log(videoId);
+
+    const video = await Video.findById(videoId)
+    console.log(video);
+    
+    return res.status(200).json(new ApiResponse(200, video, "Video fetched successfully"))
+});
+
+export { publishAVideo , getVideoById };
