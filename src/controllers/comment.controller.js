@@ -56,11 +56,28 @@ const updateComment = asyncHandler(async (req, res) => {
   );
   return res
     .status(200)
-    .json(new ApiResponse(200, updateComment, "Comment Updated Successfully"));
+    .json(new ApiResponse(200, UpdatedComment, "Comment Updated Successfully"));
 });
 
 const deleteComment = asyncHandler(async (req, res) => {
   // TODO: delete a comment
+  const {commentId} = req.params;
+
+ const deletedComment = await Comment.findByIdAndDelete(commentId);
+
+ return res.status(200).json(new ApiResponse(200, deletedComment , "Comment Deleted Successfully"))
 });
 
-export { addComment, updateComment };
+const getAllComments = asyncHandler(async(req , res)=>{
+  const {videoId} = req.params;
+
+  const comments = await Comment.find({video : videoId}).populate("owner" , "fullName email").sort({createdAt : -1})
+
+  if(!comments){
+    throw new ApiError(400, "Comments not found")
+  }
+
+  res.status(200).json(new ApiResponse(200, comments , "Comments fetched Successfully"))
+})
+
+export { addComment, updateComment , deleteComment , getAllComments };
