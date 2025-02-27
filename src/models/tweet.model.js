@@ -6,9 +6,9 @@ const tweetSchema = new mongoose.Schema({
         ref : "User"
     },
     content : {
-        type : mongoose.Types.ObjectId,
+        type : String,
         require : true
     }
 }, { timeseries: true });
 
-export const Tweet = mongoose.model("Playlist", tweetSchema);
+export const Tweet = mongoose.model("Tweet", tweetSchema);
