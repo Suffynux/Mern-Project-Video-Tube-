@@ -46,11 +46,39 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
 const updateTweet = asyncHandler(async (req, res) => {
     //TODO: update tweet
+    const {content} = req.body;
+    const {tweetId} = req.params;
+
+    if(!content) {
+        throw new ApiError(400 , "Content not found")
+    }
+     
+    if(!tweetId) {
+        throw new ApiError(400 , "Tweet not found")
+    }
+
+    const updatedTweet =  await Tweet.findByIdAndUpdate(tweetId , {
+        $set :{
+            content : content
+        }
+    },{new : true})
+
+    res.status(200).
+    json(new ApiResponse(200 , updatedTweet , "tweet Updated successfully"))
+})
+const deleteTweet = asyncHandler(async (req, res) => {
+    //TODO: delete tweet
+    const {tweetId} = req.params;
+    if(!tweetId) {
+        throw new ApiError(400 , "Tweet not found")
+    }
+
+    const deletedTweet = await Tweet.findByIdAndDelete(tweetId);
+    console.log(deletedTweet);
+
+    res.status(200).json(new ApiResponse(200, deletedTweet , "Tweet Deleted Successfully"))
     
 })
 
-const deleteTweet = asyncHandler(async (req, res) => {
-    //TODO: delete tweet
-})
 
-export {createTweet , getUserTweets}
+export {createTweet , getUserTweets , updateTweet , deleteTweet }
