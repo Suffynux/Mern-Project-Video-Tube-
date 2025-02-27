@@ -135,16 +135,6 @@ A robust backend API for a video sharing platform built with Node.js, Express, a
 ├── package.json        # Project dependencies and scripts
 └── README.md           # Project documentation
 ```
-
-## 📝 Roadmap
-
-- [ ] Add real-time notifications using Socket.io
-- [ ] Implement video recommendations algorithm
-- [ ] Add playlist functionality
-- [ ] Integrate payment gateway for premium content
-- [ ] Develop admin dashboard
-- [ ] Add analytics for content creators
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
