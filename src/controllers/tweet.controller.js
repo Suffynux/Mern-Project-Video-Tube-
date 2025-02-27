@@ -29,14 +29,28 @@ const createTweet = asyncHandler(async (req, res) => {
 
 const getUserTweets = asyncHandler(async (req, res) => {
     // TODO: get user tweets
+    const userId = req.user._id;
+    if(!userId){
+        throw new ApiError(400 , "User not found, error while getting user")
+    }
+    // We can get all the tweets of the particular user by finding the owner in the tweet data collection
+    const userTweets = await Tweet.find({owner : userId}).populate("owner" , "fullName username")
+
+    if(!userTweets){
+        throw new ApiError(400 , "Error while getting tweets")
+    }
+
+    return res.status(200).json(new ApiResponse(200, userTweets, "User tweets fetched successfully"))
+
 })
 
 const updateTweet = asyncHandler(async (req, res) => {
     //TODO: update tweet
+    
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
     //TODO: delete tweet
 })
 
-export {createTweet}
+export {createTweet , getUserTweets}
