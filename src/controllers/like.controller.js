@@ -74,6 +74,20 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 const getLikedVideos = asyncHandler(async (req, res) => {
   //TODO: get all liked videos
   const { userId } = req.params;
+
+  if (!userId) {
+    throw new ApiError(400, "User not found");
+  }
+
+  const likedVideos = await Like.find({
+    likedBy : new mongoose.Types.ObjectId(userId),
+    Video: { $ne: null }
+})
+
+  return res.status(200).json(new ApiResponse(200 , likedVideos , "Liked videos fetched successfully"))
 });
+
+
+
 
 export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos };
