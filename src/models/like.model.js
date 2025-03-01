@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { Comment } from "./comment.model";
-import { Tweet } from "./tweet.model";
+import { Comment } from "./comment.model.js";
+import { Tweet } from "./tweet.model.js";
 
 const likeSchema = new mongoose.Schema(
   {
